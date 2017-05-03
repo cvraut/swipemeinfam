@@ -1,0 +1,4 @@
+This file will contain all the stuff we need to do in order to make this project happen
+(Like a todo list):
+
+build a database that one can read and write to from different machines
