@@ -26,3 +26,5 @@ server stores the 5 images
 when updated, updated from
 credibility index
 
+Get the Menu for each dining hall
+Hashed ID is the index
