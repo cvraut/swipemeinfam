@@ -11,4 +11,4 @@ def index():
     return "hello world!"
 
 if __name__ == '__main__':
-    application.run(port=80)
+    application.run()
