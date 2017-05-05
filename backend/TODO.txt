@@ -1,0 +1,16 @@
+TODO
+
+GET USER LIST
+/swipemein/api/v1/users
+
+GET SPECIFIC USER
+/swipemein/api/v1/users/<ucinetid>
+
+POST NEW  USER
+/swipemein/api/v1/users
+
+PUT NEW USER
+/swipemein/api/v1/users/<ucinetid>
+
+DELETE USER
+/swipemein/api/v1/users/<ucinetid>
