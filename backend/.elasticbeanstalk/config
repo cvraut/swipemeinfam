@@ -1,6 +1,5 @@
 [global]
 ApplicationName=swipemein
-ApplicationVersionName=Sample Application
 AwsCredentialFile=C:\Users\Fernan Lukban\.elasticbeanstalk\aws_credential_file
 DevToolsEndpoint=git.elasticbeanstalk.us-west-1.amazonaws.com
 EnvironmentName=swipemein-env

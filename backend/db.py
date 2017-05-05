@@ -22,7 +22,7 @@ class User(Document):
     anteatery = BooleanField(default=ANTEATERY_DEFAULT)
 
 def create_user_json(user):
-    return {'ucinetid': user.ucinetid, 'name': user.name, 'swipes': user.swipes, 'cost': user.cost, 'times': user.times, 'pippin': user.pippin, 'anteatery': user.anteatery}
+    return {'ucinetid': user.ucinetid, 'name': user.name, 'swipes': user.swipes, 'cost': user.cost, 'times': user.times, 'places': {'pippin': user.pippin, 'anteatery': user.anteatery}}
 
 def create_success_json(success):
     return json.dumps({'success': success})

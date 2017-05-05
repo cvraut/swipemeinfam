@@ -2,7 +2,8 @@ from db import *
 from flask import request
 import re
 
-pattern = r'({valid_field})(__not)?__(ne|lt|gt|gte)'.format(valid_field="|".join(VALID_FIELDS))
+pattern = r'^({valid_field})(__not__(ne|lt|gt|gte)|(__(ne|lt|gt|gte)))?$'.format(valid_field="|".join(VALID_FIELDS))
+print(pattern)
 
 def get_query_dict():
     query_dict = request.args.to_dict()
@@ -16,6 +17,7 @@ def post_query_dict():
 
 def get_user_list():
     query_dict = get_query_dict()
+    print(query_dict)
     return db_get_user_list(**query_dict)
 
 def get_user(ucinetid):
