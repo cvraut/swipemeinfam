@@ -26,3 +26,52 @@ server stores the 5 images
 when updated, updated from
 credibility index
 
+Server holds Database and list of predefined images:
+
+DataBase consists of:
+name:
+  first_name(str)
+  last_name(str)
+ucinetid:
+  ucinetid(str)
+  * this will also be the key for the entire row of the DB
+# of swipes:
+  num_swipes(int)
+times:
+  WD(str: '(int: day of week):(int: hr start)-(int: hr stop);*')
+  WE(str: '(int: day of week):(int: hr start)-(int: hr stop);*')
+cost of swipe:
+  cost_swipe(num)
+IMG ID:
+  img_name(str)
+location:
+  pippins(bool)
+  anteatery(bool)
+last updated:
+  updated(str: "(int: year):(int: month):(int: day):(int: hour):(int: min):(int: secs)")
+credability index:
+  cred(num: default 0.0)
+updated from:
+  updated_from(str: ip address from where this row was mutated)
+GPS:
+  lat(num: default 0.0)
+  lng(num: default 0.0)
+
+API
+POST:
+    add info based on ucinetid
+    update one field in a row based on var name and ucinetid
+GET:
+    returns the entire database as a JSON
+    returns a single row based on ucinetid
+    
+APP:
+    search db for specified fields based on passed predicate functions -> returns list of rows that satisfy
+    
+we have to use a NoSQL database giving us key-value pairs
+Flask for API
+
+do main work in python
+
+
+
