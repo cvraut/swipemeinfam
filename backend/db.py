@@ -44,10 +44,10 @@ def db_get_user_list(**kwargs):
 def db_get_user(ucinetid):
     return db_get_user_list(ucinetid=ucinetid)
 
-def db_post_user(ucinetid, name, swipes, cost=COST_DEFAULT, times=TIMES_DEFAULT, pippin=PIPPIN_DEFAULT, anteatery=ANTEATERY_DEFAULT):
+def db_post_user(ucinetid, name, swipes, **kwargs):
     if list(User.objects(ucinetid=ucinetid)) == []:
         try:
-            User(ucinetid=ucinetid, name=name, swipes=swipes, cost=cost, times=times, pippin=pippin, anteatery=anteatery).save()
+            User(ucinetid=ucinetid, name=name, swipes=swipes, **kwargs).save()
             return create_success_json(True)
         except:
             return create_success_json(False)
