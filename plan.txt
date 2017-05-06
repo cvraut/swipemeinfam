@@ -40,6 +40,7 @@ ucinetid:
 times:
   WD(str: '(int: day of week):(int: hr start)-(int: hr stop);*')
   WE(str: '(int: day of week):(int: hr start)-(int: hr stop);*')
+  ^fuck this plan^
 cost of swipe:
   cost_swipe(num)
 IMG ID:
@@ -53,9 +54,7 @@ credability index:
   cred(num: default 0.0)
 updated from:
   updated_from(str: ip address from where this row was mutated)
-GPS:
-  lat(num: default 0.0)
-  lng(num: default 0.0)
+
 
 API
 POST:
@@ -72,6 +71,132 @@ we have to use a NoSQL database giving us key-value pairs
 Flask for API
 
 do main work in python
+
+shell based application:
+
+How it should look (approx.):
+     _______________
+    |SWIPE ME IN FAM|
+     ````````````````
+    Listings for <time(hr)>:
+    <5 users displayed>
+    <name time loc cost (ucinetid display in shell but won't be displayed in final)>
+    ....  D:hr format for the time w/ the D:hr being the closest day and hour of that user's schedule to the specified time above
+    .....
+    ......
+    
+    commands:
+    ct <int>: change time
+    vp      : view pippins menu
+    va      : view anteatery menu
+    sp <str>: select person from list
+    ca      : create account to DB
+    ma      : modify a field in an existing account
+    cs      : change sorting priority
+    f       : filter DB for specific fields
+    <ENTER> : display the next 5 users in search
+    q       : quit (terminate)
+    CMD: *(user puts command here)
+
+IF user enters invalid cmd, don't crash simply tell them its invalid and why
+This app should have a DEBUG cmd telling us what the fuck is going on behind the scenes in the project
+
+
+Commands in depth:
+ct:
+changes the time at the top of the display under the logo to the new specified time.
+sorts the db and displays the results as per this new time
+
+if the secified time is invalid print message explaining issue
+
+vp:
+this command will cause the program to scrape the menu from the pippins website and display it
+
+va:
+this command will scrape the menu from the anteatery website
+
+sp:
+the str provided should be the ucinetid of the person from the DB
+this will prompt up  a [Y/N] confirmation if the person with that ucinetid exists in the DB
+if the user selects no then just redisplay the data.
+if the user selects yes then prompt user for their ucinetid and name and the date and location of the meet-up.
+confirm data, then send email to person selected by user stating who selected them, the time of proposed meet, location, and a response survey
+(this is where it gets confusing cuz part of this can only be done with the django thing done):
+    the response survey consists of a link that the person can click on leading to a special confirmation page of the site
+        this confirmation page should store the requested person's name and ucinetid, the requestor's name and ucinetid
+        the page will display two buttons(accept or decline which the person can click) and the time of the propsed meetup
+        upon clicking the page should display the result of their descision and inform the people involved of the descicion
+        (it is important to note that at this time if the person accepts the request their # of swipes will change accordingly but not success-fail rate)
+        
+        5 minutes after the scheduled meet-up time a followup email should be sent to both users determining if the experience was succesful or not:
+        this would be done through two surveys through the website which would be administered to both people. 
+        One would be given to the bearer of the swipe, which would confirm the transaction took place (default, it did) if the person says no then they would get their lost swipe back.
+        The other would be given to the client of the swiper and based on their response the succes rate would increase or the fail rate would increase the default would be no change
+
+ca:
+this will request a shit ton of data from the user:
+    name <str>
+    ucinetid <str>
+    locs [pippins,anteatery] <str>
+    times [<str: day of week>:<int>-<int>,+] <str>
+    number of swipes(default=??) <int>
+    cost of swipes: <float>
+    *put info in the DB
+    *send email to verify w/ a verification code
+    tell user that an email with verification code was sent to *ucinetid*@uci.edu
+    verification code <int>
+    *reprompt if failed but with option to send new code
+    *if succeeded, notify user & augment their success value by 1
+redisplay the screen
+    
+ma:
+prompt for ucinetid:
+display the record at the given ucinetid if it exists:
+if it doesn't ask user if they would like to add themselves to the DB and launch the ca command depending on response
+display the record of that user with each value line-by-line
+prompt the user to enter in the changes as: <varname> = <new val>
+store change in DB
+keep reprompting with a q to quit
+
+cs:
+first things first: the DEFAULT sorting hierarchy:
+1st: TIME
+2nd: CRED index
+3rd: # of swipes
+4th: COST of each swipe
+*important* name & loc are ommitted from default but can get added on later
+
+*Also important, credability index is always second!!*
+
+prompt user to sort based on [time,# of swipes,cost,location,name]:
+sort accordingly but credability index should always be the second sorting field, the rest of the order can be kept the same accounting for the changes made previously:
+    IE: change to name & then cost -> new hierarchy =
+    1st cost
+    2nd cred index
+    3rd name
+    4th time
+    5th # of swipes
+
+f:
+prompt the user to specify fields:
+    prompt filter by name (blank for ALL names) <str>
+    prompt filter by time (blank for time) <str>
+    prompt filter by location (blank for all) <str>
+    prompt filter by cost(*all offers at given cost or lower) (blank for all cost offers) <int>
+    
+    && all these queries and update the listings accordingly
+    (sort should be by whatever user specified)
+    
+    
+<ENTER>
+refresh the display and show the next 5 users in the sorted queue
+
+q:
+end the program write any unsaved changes to the DB, log all data to a log file with the given time
+
+
+This should be the "brief" rundown of how the CLI of the swipe me in app should work
+
 
 
 
