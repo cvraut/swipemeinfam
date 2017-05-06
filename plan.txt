@@ -197,6 +197,21 @@ end the program write any unsaved changes to the DB, log all data to a log file 
 
 This should be the "brief" rundown of how the CLI of the swipe me in app should work
 
+THE CREDIBILITY INDEX FORMULA AND CALCULATIONS:
+so we use 4 things that we store for each user:
+                                      DEFAULTS:
+s: # of successes                     0 -> 1 when email is confirmed
+f: # of fails                         1
+n: # of swipes                        30 or user specified
+r: total response time(days for now)  1
 
+formula is:
+s/f*n/(r/s+f)**.5
+this will reward people with higher number of successes, higher number of swipes, and faster response times
+this will hurt people with higher number of failures, lower number of swipes, and slower response times
 
+The index should range from:
+0 - 1046(max assuming ideal)
+
+^this janky ass formula worked on paper but we might have to tweak it in production later^
 
