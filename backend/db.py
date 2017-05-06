@@ -30,7 +30,7 @@ class User(Document):
 
 
 def create_user_json(user):
-    return {'ucinetid': user.ucinetid, 'name': user.name, 'swipes': user.swipes, 'cost': user.cost, 'times': user.times, 'places': {'pippin': user.pippin, 'anteatery': user.anteatery}}
+    return {'ucinetid': user.ucinetid, 'name': user.name, 'swipes': user.swipes, 'cost': user.cost, 'times': {'wd_times': user.wd_times, 'we_times': user.we_times}, 'places': {'pippin': user.pippin, 'anteatery': user.anteatery}, 'last_updated': user.last_updated, 'credibility_index': user.credibility_index, 'img_url': user.img_url}
 
 def create_success_json(success):
     return json.dumps({'success': success})
