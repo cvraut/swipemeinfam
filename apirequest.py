@@ -22,15 +22,31 @@ def _build_url_with_ucinetid(ucinetid: str) -> str:
 def get_request(params: dict) -> str:
     ''' This function gets the information from the API as a JSON and returns it.
         params is a dictionary of query parameters (name, swipes, cost, etc.)'''
-
+    
     url = _build_url_for_get(params)
     response = None
-
+    
     try:
         response = request.urlopen(url)
         json_text = response.read().decode(encoding = 'utf-8')
         return json.loads(json_text)
+    
+    finally:
+        if response != None:
+            response.close()
 
+def get_request_ucinetid(ucinetid) -> str:
+    ''' This function gets the information from the API as a JSON and returns it.
+        params is a dictionary of query parameters (name, swipes, cost, etc.)'''
+    
+    url = _build_url_with_ucinetid(ucinetid)
+    response = None
+    
+    try:
+        response = request.urlopen(url)
+        json_text = response.read().decode(encoding = 'utf-8')
+        return json.loads(json_text)
+    
     finally:
         if response != None:
             response.close()
