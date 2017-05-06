@@ -9,17 +9,25 @@ COST_DEFAULT = 0.0
 TIMES_DEFAULT = ''
 PIPPIN_DEFAULT = True
 ANTEATERY_DEFAULT = True
+LAST_UPDATED_DEFAULT = ''
+CREDIBILITY_INDEX_DEFAULT = 1.0
+IMG_URL_DEFAULT = ''
 
-VALID_FIELDS = ('ucinetid', 'name', 'swipes', 'cost', 'times', 'pippin', 'anteatery')
+VALID_FIELDS = ('ucinetid', 'name', 'swipes', 'cost', 'wd_times', 'we_times', 'pippin', 'anteatery', 'last_updated', 'credibility_index', 'img_url')
 
 class User(Document):
     ucinetid = StringField(required=True, max_length = 9)
     name = StringField(required=True, max_length = 20)
     swipes = IntField(required=True)
     cost = FloatField(default=COST_DEFAULT)
-    times = StringField(default=TIMES_DEFAULT)
+    wd_times = StringField(default=TIMES_DEFAULT)
+    we_times = StringField(default=TIMES_DEFAULT)
     pippin = BooleanField(default=PIPPIN_DEFAULT)
     anteatery = BooleanField(default=ANTEATERY_DEFAULT)
+    last_updated = StringField(default=LAST_UPDATED_DEFAULT)
+    credibility_index = FloatField(default=CREDIBILITY_INDEX_DEFAULT)
+    img_url = StringField(dfeault=IMG_URL_DEFAULT)
+
 
 def create_user_json(user):
     return {'ucinetid': user.ucinetid, 'name': user.name, 'swipes': user.swipes, 'cost': user.cost, 'times': user.times, 'places': {'pippin': user.pippin, 'anteatery': user.anteatery}}
