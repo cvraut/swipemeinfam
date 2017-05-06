@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+    $("button").click(function(){
+        $.ajax({
+        	url: "http://backend-dev.us-west-1.elasticbeanstalk.com/swipemein/api/v1/users",
+        	data: {
+        		format: 'json'
+        	},
+        	error: function() {
+        		alert('fail');
+        	},
+        	dataType: 'json',
+        	success: function(data){
+        		document.getElementById("data").innerHTML = JSON.stringify(data);
+        	},
+        	type: "GET"
+        });
+    });
+});
+</script>
+</head>
+<body>
+
+<button>Send an HTTP GET request to a page and get the result back</button>
+
+<div id="data"></div>
+
+</body>
+</html>
