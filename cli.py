@@ -1,6 +1,8 @@
 import apirequest
+import requests
 from copy import copy
-DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+from lxml import html
+DAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
 DEFAULT_SORT = ['times', 'credibility_index', 'swipes', 'cost']
 
 def run_gui():
@@ -47,10 +49,18 @@ def run_gui():
 
 def display_pippin_menu():
     #XXXXXX I'm too lazy to scrape the website for it right now
+    # I downloaded some other libraries to help with this (lxml and requests) - Cody
+    page = requests.get("INSERT PIPPIN WEBSITE HERE")
+    overview = html.fromstring(page.content)
+    # insert where stuff is located in html here
     pass
 
 def display_anteatery_menu():
     #XXXXXX I'm too lazy to scrape the website for it right now
+    # Same here - Cody
+    page = requests.get("INSERT ANTEATERY WEBSITE HERE")
+    overview = html.fromstring(page.content)
+    # insert where stuff is located in html here
     pass
 
 def select_person(ucinetid: str):
@@ -58,14 +68,67 @@ def select_person(ucinetid: str):
     pass
 
 def create_account():
-    ucinetid = input('Enter your ucinetid')
-    swipes = int(input('Enter the number of swipes you have'))
-    # .....
     # Create the account and put it in the DB
+    infodict = {}
+    name = input('Enter your name: ')
+    infodict['name'] = name
+    ucinetid = input('Enter your ucinetid: ')
+    swipes = int(input('Enter the number of swipes you have: '))
+    infodict['swipes'] = swipes
+    fee = float(input('Enter your price per swipe: '))
+    infodict['cost'] = fee
+    locations = ''
+    while True:
+        locations = input('Enter the locations you are able to swipe into (Pippins or Anteatery): ')
+        if 'pippins' not in locations.lower() and 'anteatery' not in locations.lower():
+            print('Error: Invalid dining hall location(s)')
+        else:
+            break
+    infodict['locations'] = locations
+    days = []
+    while True:
+        days = input('Enter the days you are available separated by only spaces: ').strip().split('')
+        valid_days = True
+        for day in days:
+            day = day.lower()
+            if day not in DAYS:
+                print('Error: Invalid day of the week')
+                valid_days = False
+        if valid_days:
+            break
+    times = []
+    for day in days:
+        timerange = map(int(), input('Enter an approximate time range in hours for {} separated by a - in 24 hour time(i.e. 7-13)'.format(day)).strip().split('-'))
+        if day not in ['saturday' , 'sunday']:
+            if timerange[0] < 7 or timerange[1] > 20:
+                print('Error: Invalid time range')
+                while True:
+                    timerange = map(int(), input('Enter an approximate time range in hours for {} separated by a - in 24 hour time(i.e. 7-13)'.format(day)).strip().split('-'))
+                    if timerange[0] < 7 or timerange[1] > 20:
+                        print('Error: Invalid time range')
+                    else:
+                        break
+        else:
+            if timerange[0] < 11 or timerange[1] > 20 or (timerange[0] > 15 and timerange[0] < 17) or (timerange[1] > 15 and timerange[1] < 17):
+                print('Error: Invalid time range')
+                while True:
+                    timerange = map(int(), input('Enter an approximate time range in hours for {} separated by a - in 24 hour time(i.e. 7-13)'.format(day)).strip().split('-'))
+                    if timerange[0] < 11 or timerange[1] > 20 or (timerange[0] > 15 and timerange[0] < 17) or (timerange[1] > 15 and timerange[1] < 17):
+                        print('Error: Invalid time range')
+                    else:
+                        break
+        times.append(tuple(timerange))
+    '''
+     day and times will be added as a dictionary whose items are 2-tuples with the time range of availability
+     we might need to update the api because im putting weekends and weekdays together and checking the times separately
+     - Cody
+    '''
+    infodict['days'] = {day:time for day in days for time in times}
+    apirequest.post_request(ucinetid, infodict)
 
 def change_sorting_priority():
     pass
-    #send help, calling display_people(sort_by) with sort_by being a list of the attributes
+    # send help, calling display_people(sort_by) with sort_by being a list of the attributes
     # that you want to prioritize. The code is pretty messy, you can change it if you want.
 
 def filter_table():
