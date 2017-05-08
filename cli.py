@@ -1,8 +1,9 @@
 import apirequest
 import requests
 from copy import copy
+from datetime import datetime
 from lxml import html
-DAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
+DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
 DEFAULT_SORT = ['times', 'credibility_index', 'swipes', 'cost']
 
 def run_gui():
@@ -13,7 +14,7 @@ def run_gui():
     while True:
         print('''
         commands:
-    ct D:HH:MM: change time
+    ct Day:HH : change time
     vp        : view pippins menu
     va        : view anteatery menu
     sp <str>  : select person from list
@@ -25,10 +26,12 @@ def run_gui():
     q         : quit (terminate)
     ''')
         command = input('Enter a command -> ')
+        time = str(int(str(datetime.now())[11:13])+1) + ':00'
+        day = DAYS[datetime.today().weekday()]
+        
 
         if command.startswith('ct'):
-            time = command[3:]
-            display_people(time, DEFAULT_SORT)
+            time = command[3:] + ':00'
         elif command == 'vp':
             display_pippin_menu()
         elif command == 'va':
@@ -46,22 +49,14 @@ def run_gui():
         elif command == 'q':
             break # GRADY IS TRIGGERED
 
+        display_people(day, time, DEFAULT_SORT)
+
 
 def display_pippin_menu():
-    #XXXXXX I'm too lazy to scrape the website for it right now
-    # I downloaded some other libraries to help with this (lxml and requests) - Cody
-    page = requests.get("INSERT PIPPIN WEBSITE HERE")
-    overview = html.fromstring(page.content)
-    # insert where stuff is located in html here
-    pass
+    print("https://uci.campusdish.com/Commerce/Catalog/Menus.aspx?LocationId=4832")    
 
 def display_anteatery_menu():
-    #XXXXXX I'm too lazy to scrape the website for it right now
-    # Same here - Cody
-    page = requests.get("INSERT ANTEATERY WEBSITE HERE")
-    overview = html.fromstring(page.content)
-    # insert where stuff is located in html here
-    pass
+    print("https://uci.campusdish.com/Commerce/Catalog/Menus.aspx?LocationId=3056")
 
 def select_person(ucinetid: str):
     # Send an email to ucinetid@uci.edu, with a confirmation/declination of the invitation
@@ -136,13 +131,15 @@ def filter_table():
 
 def display_next_five_users(time: str):
     apirequest.get_request()
+    pass
 
 
 
-def display_people(time:str, sort_by=['times', 'credibility_index', 'swipes', 'cost']):
+
+def display_people(day:str, time:str, sort_by=['times', 'credibility_index', 'swipes', 'cost']):
     sort_by = _get_sorting_preferences(sort_by)
     print('                        Swipe Me In              ')
-    print('               Listings for ' + DAYS[int(time[0])] + ' at ' + time[2:])
+    print('               Listings for ' + day + ' at ' + time)
 
     print('{:<10}{:<10}{:<10}{:<15}{:<10}{:<10}'.format('Name', 'Time', 'Pippin?', 'Anteatery?', 'Cost', 'Swipes'))
 
