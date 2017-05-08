@@ -42,7 +42,7 @@ def run_gui():
         elif command == 'f':
             filter_table()
         elif command == '':
-            display_next_five_users()
+            display_next_five_users(time)
         elif command == 'q':
             break # GRADY IS TRIGGERED
 
@@ -134,8 +134,8 @@ def change_sorting_priority():
 def filter_table():
     pass
 
-def display_next_five_users():
-    apirequest.
+def display_next_five_users(time: str):
+    apirequest.get_request()
 
 
 

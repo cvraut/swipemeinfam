@@ -2,3 +2,4 @@ django
 requests
 lxml
 flask
+mongoengine
