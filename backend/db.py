@@ -6,11 +6,14 @@ CONNECTION = 'mongodb://cluster0-shard-00-00-tijfs.mongodb.net:27017,cluster0-sh
 connect(db='users', host=CONNECTION, username='swipe', password='zotzotzot', alias='default')
 
 COST_DEFAULT = 0.0
-TIMES_DEFAULT = ''
+TIMES_DEFAULT = {'monday':'','tuesday':'','wednesday':'','thursday':'','friday':'','saturday':'','sunday':''}
 PIPPIN_DEFAULT = True
 ANTEATERY_DEFAULT = True
+SUCCESS_DEFAULT = 0
+FAILURE_DEFAULT = 1
+TOTAL_RESPONSE_TIME_DEFAULT = 1
 
-VALID_FIELDS = ('ucinetid', 'name', 'swipes', 'cost', 'times', 'pippin', 'anteatery')
+VALID_FIELDS = ('ucinetid', 'name', 'swipes', 'cost', 'times', 'pippin', 'anteatery','success','failure','response_time')
 
 class User(Document):
     ucinetid = StringField(required=True, max_length = 9)
@@ -20,9 +23,12 @@ class User(Document):
     times = StringField(default=TIMES_DEFAULT)
     pippin = BooleanField(default=PIPPIN_DEFAULT)
     anteatery = BooleanField(default=ANTEATERY_DEFAULT)
+    success = IntField(default=SUCCESS_DEFAULT)
+    failure = IntField(default=FAILURE_DEFAULT)
+    response_time = IntField(default=TOTAL_RESPONSE_TIME_DEFAULT)
 
 def create_user_json(user):
-    return {'ucinetid': user.ucinetid, 'name': user.name, 'swipes': user.swipes, 'cost': user.cost, 'times': user.times, 'places': {'pippin': user.pippin, 'anteatery': user.anteatery}}
+    return {'ucinetid': user.ucinetid, 'name': user.name, 'swipes': user.swipes, 'cost': user.cost, 'times': user.times, 'places': {'pippin': user.pippin, 'anteatery': user.anteatery},'success': user.success,'failure': user.failure,'response_time':user.response_time}
 
 def create_success_json(success):
     return json.dumps({'success': success})
@@ -36,10 +42,10 @@ def db_get_user_list(**kwargs):
 def db_get_user(ucinetid):
     return db_get_user_list(ucinetid=ucinetid)
 
-def db_post_user(ucinetid, name, swipes, cost=COST_DEFAULT, times=TIMES_DEFAULT, pippin=PIPPIN_DEFAULT, anteatery=ANTEATERY_DEFAULT):
+def db_post_user(ucinetid, name, swipes, cost=COST_DEFAULT, times=TIMES_DEFAULT, pippin=PIPPIN_DEFAULT, anteatery=ANTEATERY_DEFAULT,success=SUCCESS_DEFAULT,failure=FAILURE_DEFAULT,response_time=TOTAL_RESPONSE_TIME_DEFAULT):
     if list(User.objects(ucinetid=ucinetid)) == []:
         try:
-            User(ucinetid=ucinetid, name=name, swipes=swipes, cost=cost, times=times, pippin=pippin, anteatery=anteatery).save()
+            User(ucinetid=ucinetid, name=name, swipes=swipes, cost=cost, times=times, pippin=pippin, anteatery=anteatery,success=success,failure=failure,response_time=response_time).save()
             return create_success_json(True)
         except:
             return create_success_json(False)
