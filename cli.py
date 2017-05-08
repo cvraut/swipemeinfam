@@ -28,6 +28,7 @@ def run_gui():
         command = input('Enter a command -> ')
         time = str(int(str(datetime.now())[11:13])+1) + ':00'
         day = DAYS[datetime.today().weekday()]
+        sort_by = DEFAULT_SORT
         
 
         if command.startswith('ct'):
@@ -41,15 +42,15 @@ def run_gui():
         elif command == 'ca':
             create_account()
         elif command == 'cs':
-            change_sorting_priority()
+            sort_by = change_sorting_priority()
         elif command == 'f':
             filter_table()
         elif command == '':
-            display_next_five_users(time)
+            display_next_five_users()
         elif command == 'q':
             break # GRADY IS TRIGGERED
 
-        display_people(day, time, DEFAULT_SORT)
+        display_people(day, time, sort_by)
 
 
 def display_pippin_menu():
@@ -122,17 +123,14 @@ def create_account():
     apirequest.post_request(ucinetid, infodict)
 
 def change_sorting_priority():
-    pass
-    # send help, calling display_people(sort_by) with sort_by being a list of the attributes
-    # that you want to prioritize. The code is pretty messy, you can change it if you want.
+    priority = input("Enter in the new field you would like to prioritize in the table -> ")
+    return _get_sorting_preferences([priority])
 
 def filter_table():
     pass
 
-def display_next_five_users(time: str):
-    apirequest.get_request()
+def display_next_five_users():
     pass
-
 
 
 
@@ -159,6 +157,8 @@ def _get_sorting_preferences(sort_by):
         sorter = copy(DEFAULT_SORT)
         priority = sorter.pop(index)
         sorter.insert(0, priority)
+        credibility = sorter.pop(sorter.index('credibility_index'))
+        sorter.insert(1, credibility)
         return sorter
 
     return DEFAULT_SORT
