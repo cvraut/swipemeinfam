@@ -6,14 +6,14 @@ CONNECTION = 'mongodb://cluster0-shard-00-00-tijfs.mongodb.net:27017,cluster0-sh
 connect(db='users', host=CONNECTION, username='swipe', password='zotzotzot', alias='default')
 
 COST_DEFAULT = 0.0
-TIMES_DEFAULT = ''
+TIMES_DEFAULT = {'monday':'','tuesday':'','wednesday':'','thursday':'','friday':'','saturday':'','sunday':''}
 PIPPIN_DEFAULT = True
 ANTEATERY_DEFAULT = True
-LAST_UPDATED_DEFAULT = ''
-CREDIBILITY_INDEX_DEFAULT = 1.0
-IMG_URL_DEFAULT = ''
+SUCCESS_DEFAULT = 0
+FAILURE_DEFAULT = 1
+TOTAL_RESPONSE_TIME_DEFAULT = 1
 
-VALID_FIELDS = ('ucinetid', 'name', 'swipes', 'cost', 'wd_times', 'we_times', 'pippin', 'anteatery', 'last_updated', 'credibility_index', 'img_url')
+VALID_FIELDS = ('ucinetid', 'name', 'swipes', 'cost', 'times', 'pippin', 'anteatery','success','failure','response_time')
 
 class User(Document):
     ucinetid = StringField(required=True, max_length = 9)
@@ -24,13 +24,12 @@ class User(Document):
     we_times = StringField(default=TIMES_DEFAULT)
     pippin = BooleanField(default=PIPPIN_DEFAULT)
     anteatery = BooleanField(default=ANTEATERY_DEFAULT)
-    last_updated = StringField(default=LAST_UPDATED_DEFAULT)
-    credibility_index = FloatField(default=CREDIBILITY_INDEX_DEFAULT)
-    img_url = StringField(dfeault=IMG_URL_DEFAULT)
-
+    success = IntField(default=SUCCESS_DEFAULT)
+    failure = IntField(default=FAILURE_DEFAULT)
+    response_time = IntField(default=TOTAL_RESPONSE_TIME_DEFAULT)
 
 def create_user_json(user):
-    return {'ucinetid': user.ucinetid, 'name': user.name, 'swipes': user.swipes, 'cost': user.cost, 'times': {'wd_times': user.wd_times, 'we_times': user.we_times}, 'places': {'pippin': user.pippin, 'anteatery': user.anteatery}, 'last_updated': user.last_updated, 'credibility_index': user.credibility_index, 'img_url': user.img_url}
+    return {'ucinetid': user.ucinetid, 'name': user.name, 'swipes': user.swipes, 'cost': user.cost, 'times': user.times, 'places': {'pippin': user.pippin, 'anteatery': user.anteatery},'success': user.success,'failure': user.failure,'response_time':user.response_time}
 
 def create_success_json(success):
     return json.dumps({'success': success})
