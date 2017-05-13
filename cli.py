@@ -1,8 +1,6 @@
 import apirequest
-import requests
 from copy import copy
 from datetime import datetime
-from lxml import html
 DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
 DEFAULT_SORT = ['times', 'credibility_index', 'swipes', 'cost']
 
