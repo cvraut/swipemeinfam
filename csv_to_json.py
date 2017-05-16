@@ -1,9 +1,9 @@
 csv_in = open('test_data.csv')
-tags = next(csv_in).strip().split(',')
+tags = next(csv_in).strip().split(",")
 from collections import defaultdict
 json = defaultdict(dict)
 def next_val(s):
-    result = ''
+    result = ""
     if s != '':
         if s[0] == '"':
             for i in range(len(s[2:])):
@@ -45,6 +45,8 @@ for row in csv_in:
 json = dict(json)
 csv_in.close()
 db = open('dankbase.json','w')
-db.write(str(json))
+json_str = str(json).replace('True','true')
+json_str = json_str.replace('False','false')
+db.write(json_str.replace("'",'"'))
 db.close()
-print(json)
+print(json_str)
