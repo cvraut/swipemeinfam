@@ -215,3 +215,6 @@ The index should range from:
 
 ^this janky ass formula worked on paper but we might have to tweak it in production later^
 
+Ey boys if we wanna send emails were gonna need an SMTP service like MailGun since google doesn't do free no more.
+If you guys have alternative ideas like sending texts or something write it down here.
+

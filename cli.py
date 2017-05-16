@@ -1,6 +1,8 @@
 import apirequest
+import smtplib
 from copy import copy
 from datetime import datetime
+from email.mime.text import MIMETEXT
 DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
 DEFAULT_SORT = ['times', 'credibility_index', 'swipes', 'cost']
 
@@ -59,7 +61,31 @@ def display_anteatery_menu():
 
 def select_person(ucinetid: str):
     # Send an email to ucinetid@uci.edu, with a confirmation/declination of the invitation
-    pass
+	# This code should be easy to port to django using django's send_mail() and the same string
+	# Documentation: https://docs.djangoproject.com/en/1.11/topics/email/
+	# Still need a SMTP service though boys
+	
+	email = "{}@uci.edu".format(ucinetid)
+	#name = apirequest.get_request({ucinetid: name}) # how the fuck does get_request work? 
+													# what are the params i have to input?
+	html_string = """\
+	<html>
+	<head></head>
+	<body>
+	<p>
+		Hello Student!<br>
+		Thank you for signing up for Antfeeder!<br>
+		<a href="http://www.google.com">Click here to confirm you registration</a>.
+	</p>
+	</body>
+	</html>
+	"""#.format(name)
+	test_server("cdxu@uci.edu") #replace with whatever email we send from later
+	test_email("craut@uci.edu") #using chinmay's email as a guinea pig
+	msg = MIMETEXT(html_string, 'html')
+	server = smtplib.SMTP('localhost') #change the domain to our SMTP host eventually
+	server.send_mail(test_server, test_email, msg.as_string())
+	server.quit()
 
 def create_account():
     # Create the account and put it in the DB
