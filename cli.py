@@ -83,7 +83,7 @@ def select_person(ucinetid: str):
 	test_server = "cdxu@uci.edu" #replace with whatever email we send from later
 	test_email = "craut@uci.edu" #using chinmay's email as a guinea pig
 	msg = MIMEText(html_string, 'html')
-	server = smtplib.SMTP('localhost') #change the domain to our SMTP host eventually
+	server = smtplib.SMTP('localhost', 1025) #change the domain to our SMTP host eventually
 	server.send_mail(test_server, test_email, msg.as_string())
 	server.quit()
 
