@@ -1,12 +1,17 @@
 import apirequest
-import smtplib
 from copy import copy
 from datetime import datetime
+import smtplib
 from email.mime.text import MIMEText
+
+
 DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
 DEFAULT_SORT = ['times', 'credibility_index', 'swipes', 'cost']
 
 def run_gui():
+
+    time, day, sort_by, people_shown, filters = reset()
+    
     print('''
     _______________
     |SWIPE ME IN FAM|
@@ -15,21 +20,21 @@ def run_gui():
         print('''
         commands:
     ct Day:HH : change time
-    vp        : view pippins menu
+    vp        : view pippin menu
     va        : view anteatery menu
     sp <str>  : select person from list
     ca        : create account to DB
     ma        : modify a field in an existing account
     cs        : change sorting priority
     f         : filter DB for specific fields
+    uf        : unfilter DB for specific fields (reset)
     <ENTER>   : display the next 5 users in search
     q         : quit (terminate)
     ''')
+
+        display_people(day, time, people_shown, sort_by, filters)
+
         command = input('Enter a command -> ')
-        time = str(int(str(datetime.now())[11:13])+1) + ':00'
-        day = DAYS[datetime.today().weekday()]
-        sort_by = DEFAULT_SORT
-        
 
         if command.startswith('ct'):
             time = command[3:] + ':00'
@@ -44,13 +49,14 @@ def run_gui():
         elif command == 'cs':
             sort_by = change_sorting_priority()
         elif command == 'f':
-            filter_table()
+            filters = filter_table()
+        elif command == 'uf':
+            time, day, sort_by, people_shown = reset()
         elif command == '':
-            display_next_five_users()
+            people_shown += 5
         elif command == 'q':
             break # GRADY IS TRIGGERED
 
-        display_people(day, time, sort_by)
 
 
 def display_pippin_menu():
@@ -61,31 +67,31 @@ def display_anteatery_menu():
 
 def select_person(ucinetid: str):
     # Send an email to ucinetid@uci.edu, with a confirmation/declination of the invitation
-	# This code should be easy to port to django using django's send_mail() and the same string
-	# Documentation: https://docs.djangoproject.com/en/1.11/topics/email/
-	# Still need a SMTP service though boys
-	
-	email = "{}@uci.edu".format(ucinetid)
-	#name = apirequest.get_request({ucinetid: name}) # how the fuck does get_request work? 
-													# what are the params i have to input?
-	html_string = """\
-	<html>
-	<head></head>
-	<body>
-	<p>
-		Hello Student!<br>
-		Thank you for signing up for Antfeeder!<br>
-		<a href="http://www.google.com">Click here to confirm you registration</a>.
-	</p>
-	</body>
-	</html>
-	"""#.format(name)
-	test_server = "cdxu@uci.edu" #replace with whatever email we send from later
-	test_email = "craut@uci.edu" #using chinmay's email as a guinea pig
-	msg = MIMEText(html_string, 'html')
-	server = smtplib.SMTP('localhost', 1025) #change the domain to our SMTP host eventually
-	server.send_mail(test_server, test_email, msg.as_string())
-	server.quit()
+    # This code should be easy to port to django using django's send_mail() and the same string
+    # Documentation: https://docs.djangoproject.com/en/1.11/topics/email/
+    # Still need a SMTP service though boys
+    
+    email = "{}@uci.edu".format(ucinetid)
+        #name = apirequest.get_request({ucinetid: name}) # how the fuck does get_request work?
+        # what are the params i have to input?
+        html_string = """\
+            <html>
+            <head></head>
+            <body>
+            <p>
+            Hello Student!<br>
+            Thank you for signing up for Antfeeder!<br>
+            <a href="http://www.google.com">Click here to confirm you registration</a>.
+            </p>
+            </body>
+            </html>
+            """#.format(name)
+        test_server = "cdxu@uci.edu" #replace with whatever email we send from later
+        test_email = "craut@uci.edu" #using chinmay's email as a guinea pig
+        msg = MIMEText(html_string, 'html')
+        server = smtplib.SMTP('localhost', 1025) #change the domain to our SMTP host eventually
+        server.send_mail(test_server, test_email, msg.as_string())
+        server.quit()
 
 def create_account():
     # Create the account and put it in the DB
@@ -99,15 +105,27 @@ def create_account():
     infodict['cost'] = fee
     locations = ''
     while True:
-        locations = input('Enter the locations you are able to swipe into (Pippins or Anteatery): ')
-        if 'pippins' not in locations.lower() and 'anteatery' not in locations.lower():
+        locations = input('Enter the locations you are able to swipe into (Pippin or Anteatery): ')
+        if 'pippin' not in locations.lower() and 'anteatery' not in locations.lower():
             print('Error: Invalid dining hall location(s)')
         else:
             break
-    infodict['locations'] = locations
+        
+    places_dict = {}
+    places_dict['pippin'] = False
+    places_dict['anteatery'] = False
+    
+    if 'pippin' in locations.lower():
+        places_dict['pippin'] = True
+        
+    if 'anteatery' in locations.lower():
+        places_dict['anteatery'] = True
+    
+    infodict['places'] = places_dict
+        
     days = []
     while True:
-        days = input('Enter the days you are available separated by only spaces: ').strip().split('')
+        days = input('Enter the days you are available separated by only spaces: ').strip().split()
         valid_days = True
         for day in days:
             day = day.lower()
@@ -116,14 +134,16 @@ def create_account():
                 valid_days = False
         if valid_days:
             break
-    times = []
+    times = {}
     for day in days:
-        timerange = map(int(), input('Enter an approximate time range in hours for {} separated by a - in 24 hour time(i.e. 7-13)'.format(day)).strip().split('-'))
+        timerange = input('Enter an approximate time range in hours for {} separated by a - in 24 hour time(i.e. 7-13)'.format(day)).strip().split('-')
+        timerange = [int(i) for i in timerange]
         if day not in ['saturday' , 'sunday']:
             if timerange[0] < 7 or timerange[1] > 20:
                 print('Error: Invalid time range')
                 while True:
-                    timerange = map(int(), input('Enter an approximate time range in hours for {} separated by a - in 24 hour time(i.e. 7-13)'.format(day)).strip().split('-'))
+                    timerange = input('Enter an approximate time range in hours for {} separated by a - in 24 hour time(i.e. 7-13)'.format(day)).strip().split('-')
+                    timerange = [int(i) for i in timerange]
                     if timerange[0] < 7 or timerange[1] > 20:
                         print('Error: Invalid time range')
                     else:
@@ -132,18 +152,22 @@ def create_account():
             if timerange[0] < 11 or timerange[1] > 20 or (timerange[0] > 15 and timerange[0] < 17) or (timerange[1] > 15 and timerange[1] < 17):
                 print('Error: Invalid time range')
                 while True:
-                    timerange = map(int(), input('Enter an approximate time range in hours for {} separated by a - in 24 hour time(i.e. 7-13)'.format(day)).strip().split('-'))
+                    timerange = input('Enter an approximate time range in hours for {} separated by a - in 24 hour time(i.e. 7-13)'.format(day)).strip().split('-')
+                    timerange = [int(i) for i in timerange]
                     if timerange[0] < 11 or timerange[1] > 20 or (timerange[0] > 15 and timerange[0] < 17) or (timerange[1] > 15 and timerange[1] < 17):
                         print('Error: Invalid time range')
                     else:
                         break
-        times.append(tuple(timerange))
-    '''
-     day and times will be added as a dictionary whose items are 2-tuples with the time range of availability
-     we might need to update the api because im putting weekends and weekdays together and checking the times separately
-     - Cody
-    '''
-    infodict['days'] = {day:time for day in days for time in times}
+        timesstr = ''
+        for i in range(timerange[0], timerange[1]+1):
+            timesstr += str(i) + ' '
+        times[day] = timesstr.strip()
+        
+    infodict['days'] = times
+
+    for key, val in infodict.items():
+        print(key, val)
+    
     apirequest.post_request(ucinetid, infodict)
 
 def change_sorting_priority():
@@ -151,14 +175,31 @@ def change_sorting_priority():
     return _get_sorting_preferences([priority])
 
 def filter_table():
-    pass
+    result = {}
+    
+    name = input("Enter the name to filter for [Enter for all names] -> ")
+    time = input("Enter the time to filter for [Enter for all times] -> ")
+    location = input("Enter the location to filter for [Blank for all places] -> ")
+    cost = input("Enter the cost to filter for [Enter for all prices] -> ")
 
-def display_next_five_users():
-    pass
+    if name != '':
+        result['name'] = name
+    if time != '':
+        result['time'] = time
+    if location != '':
+        result['location'] = location
+    if cost != '':
+        result['cost'] = cost
+    
+    return result
+    
+
+def reset():
+    return (str(int(str(datetime.now())[11:13])+1) + ':00', DAYS[datetime.today().weekday()], DEFAULT_SORT, 5, {})
 
 
 
-def display_people(day:str, time:str, sort_by=['times', 'credibility_index', 'swipes', 'cost']):
+def display_people(day:str, time:str, people_shown, sort_by=['times', 'credibility_index', 'swipes', 'cost'], filters={}):
     sort_by = _get_sorting_preferences(sort_by)
     print('                        Swipe Me In              ')
     print('               Listings for ' + day + ' at ' + time)
@@ -167,8 +208,18 @@ def display_people(day:str, time:str, sort_by=['times', 'credibility_index', 'sw
 
     json_text = apirequest.get_request({'times':time})
     result = ''
+    count = 0
     for user in sorted(json_text['users'], key=(lambda x:(x[sort_by[0]],x[sort_by[1]],x[sort_by[2]],x[sort_by[3]]))):
-        result += '{:<10}{:<10}{:<10}{:<15}{:<10}{:<10}'.format(user['name'], str(user['times']['wd_times']), str(user['places']['pippin']), str(user['places']['anteatery']), str(user['cost']), str(user['swipes'])) + '\n'
+        if len(filters) == 0:
+            result += '{:<10}{:<10}{:<10}{:<15}{:<10}{:<10}'.format(user['name'], str(user['times']['wd_times']), str(user['places']['pippin']), str(user['places']['anteatery']), str(user['cost']), str(user['swipes'])) + '\n'
+            count += 1
+        else:
+            if all(user[key] == filters[key] for key in filters):                  
+                result += '{:<10}{:<10}{:<10}{:<15}{:<10}{:<10}'.format(user['name'], str(user['times']['wd_times']), str(user['places']['pippin']), str(user['places']['anteatery']), str(user['cost']), str(user['swipes'])) + '\n'
+                count += 1
+
+        if count == people_shown:
+            break
 
     print(result)
 
