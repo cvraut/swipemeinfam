@@ -1,6 +1,1 @@
-Add # of successes (int, default = 0)
-Add # of fails/bad reviews (int, default = 1)
-Add total response time to email request in days (int, default 1)
-
-Change times to a single str (str, ex. '0:18:00-19:00' or '4:12:00-13:00') --> The first number represents the day of the week.
-So the first time represents Sunday at 6:00-7:00pm, and the second time represents Thursday at 12:00 - 1:00pm. (Sunday = 0, Monday = 1, etc.)
+FUCK IT, WE'LL DO IT LIVE
