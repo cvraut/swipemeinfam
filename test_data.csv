@@ -1,4 +1,4 @@
-ucinetid,name,swipes,cost,Monday,Tuesday,Wednesday,Thrusday,Friday,Saturday,Sunday,pippin,anteatery,success,failure,response_time
+ucinetid,name,swipes,cost,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday,pippin,anteatery,success,failure,response_time
 craut+swipemein0,anteater#0,15,3,"[13, 8, 12, 14, 7, 17, 19, 18]","[7, 9, 10, 13, 12, 16, 15, 14, 18]","[11, 15, 18, 13, 7]","[18, 13, 9, 7, 8, 15, 16]","[9, 10, 13, 19, 17, 12]","[13, 18, 14, 19, 12, 15, 11, 17]","[19, 20, 15, 18, 11, 14, 12]",FALSE,TRUE,12,3,21
 satoks+swipemein1,anteater#1,21,4,"[12, 17, 13, 14, 8, 18, 20, 11, 15]",[],"[9, 19, 8, 15, 14, 20, 17, 10, 11]","[16, 13, 8, 17, 12]","[16, 17, 20, 8, 14, 13, 10, 18]","[12, 14]","[17, 13]",FALSE,TRUE,4,5,34
 cdxu+swipemein2,anteater#2,18,3,[13],"[12, 11, 9, 13, 14, 16, 8, 19, 18]",[13],"[9, 15, 7, 8, 16, 14]","[19, 17, 8, 15]","[19, 15, 11]","[12, 15, 20, 18, 19, 11, 14, 13]",FALSE,TRUE,2,10,20

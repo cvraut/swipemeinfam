@@ -77,7 +77,7 @@ def select_person(ucinetid: str):
     # Send an email to ucinetid@uci.edu, with a confirmation/declination of the invitation
     # This code should be easy to port to django using django's send_mail() and the same string
     # Documentation: https://docs.djangoproject.com/en/1.11/topics/email/
-    # Still need a SMTP service though boys
+    # Still need a SMTP service though boys -> use mailgun get someone else's # tho... gotta avoid those spammers
     
     email = "{}@uci.edu".format(ucinetid)
         #name = apirequest.get_request({ucinetid: name}) # how the fuck does get_request work?
