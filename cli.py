@@ -11,6 +11,7 @@ DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sun
 DEFAULT_SORT = ['times', 'swipes', 'cost'] # credibility_index will always be sorted as second priority
 
 def run_gui():
+    json_text = get_data()
 
     time, day, sort_by, people_shown, filters = reset()
     
@@ -34,7 +35,7 @@ def run_gui():
     q         : quit (terminate)
     ''')
 
-        display_people(day, time, people_shown, sort_by, filters)
+        display_people(json_text, day, time, people_shown, sort_by, filters)
 
         command = input('Enter a command -> ')
 
@@ -53,6 +54,11 @@ def run_gui():
             sort_by = change_sorting_priority()
         elif command == 'f':
             filters = filter_table()
+            if 'times' in filters:
+                time = str(filters['times']) + ':00'
+            else:
+                time = reset()[0]
+
         elif command == 'uf':
             time, day, sort_by, people_shown,filters = reset()
         elif command == '':
@@ -187,49 +193,72 @@ def filter_table():
     if name != '':
         result['name'] = name
     if time != '':
-        result['times'] = time
+        result['times'] = int(time[:time.index(':')])
     if location != '':
         if location.lower() == 'pippin':
             result['pippin'] = True
         elif location.lower() == 'anteatery':
             result['anteatery'] = True
     if cost != '':
-        result['cost'] = cost
+        result['cost'] = int(cost)
     
     return result
     
 
 def reset():
-    return (str(int(str(datetime.now())[11:13])+1) + ':00', DAYS[datetime.today().weekday()], DEFAULT_SORT, 5, {})
+    day = DAYS[datetime.today().weekday()]
+    time = int(str(datetime.now())[11:13])+1
+
+    if time >= 21:
+        if day == 'Friday' or day == 'Saturday':
+            time = '11:00'
+        else:
+            time = '7:00'
+        day = DAYS[(datetime.today().weekday()+1)%7]
+    else:
+        time = str(time)+':00'
+
+    return time, day, DEFAULT_SORT, 5, {}
 
 
 
-def display_people(day:str, time:str, people_shown, sort_by=['times', 'swipes', 'cost'], filters={}):
+def display_people(json_text, day:str, time:str, people_shown, sort_by=['times', 'swipes', 'cost'], filters={}):
     sort_by = _get_sorting_preferences(sort_by)
     print('                        Swipe Me In              ')
     print('               Listings for ' + day + ' at ' + time)
     print('Sorting by: ', str(sort_by))
     print('{:<20}{:<20}{:<20}{:<20}{:<20}{:<20}'.format('Name', 'Time', 'Pippin?', 'Anteatery?', 'Cost', 'Swipes'))
 
-    #json_text = apirequest.get_request({'times':time})
-    json_data = open('dankbase.json')
-    json_text = json.load(json_data)
     result = ''
     count = 0
     for person in sorted(json_text, key=(lambda x:(sort_functions(day, time, sort_by[0], json_text[x][sort_by[0]]),-1* _cred_ind(json_text[x]['success'], json_text[x]['failure'], json_text[x]['swipes'], json_text[x]['response_time']),sort_functions(day, time, sort_by[1], json_text[x][sort_by[1]]), sort_functions(day, time, sort_by[2], json_text[x][sort_by[2]])))):
-        if len(filters) == 0:
-            result += '{:<20}{:<20}{:<20}{:<20}{:<20}{:<20}'.format(json_text[person]['name'], display_next_time(day, time, json_text[person]['times']), str(json_text[person]['pippin']), str(json_text[person]['anteatery']), str(json_text[person]['cost']), str(json_text[person]['swipes'])) + '\n'
+        if meets_filter_criteria(day, person, json_text, filters):
+            result += '{:<20}{:<20}{:<20}{:<20}{:<20}{:<20}'.format(json_text[person]['name'],display_next_time(day, time, json_text[person]['times']), str(json_text[person]['pippin']), str(json_text[person]['anteatery']), str(json_text[person]['cost']), str(json_text[person]['swipes'])) + '\n'
             count += 1
-        else:
-            if all(json_text[person][key] == filters[key] for key in filters):                  
-                result += '{:<20}{:<20}{:<20}{:<20}{:<20}{:<20}'.format(json_text[person]['name'],display_next_time(day, time, json_text[person]['times']), str(json_text[person]['pippin']), str(json_text[person]['anteatery']), str(json_text[person]['cost']), str(json_text[person]['swipes'])) + '\n'
-                count += 1
 
         if count == people_shown:
             break
 
     print(result)
 
+def meets_filter_criteria(day, person, json_text, filters):
+    if len(filters) == 0:
+        return True
+
+    for filt in filters:
+        if filt == 'name' and json_text[person]['name'] != filters['name']:
+            return False
+        if filt == 'times' and filters['times'] not in json_text[person]['times'][day]:
+            return False
+        if filt == 'pippin' and json_text[person]['pippin'] != filters['pippin']:
+            return False
+        if filt == 'anteatery' and json_text[person]['anteatery'] != filters['anteatery']:
+            return False
+        if filt == 'cost' and json_text[person]['cost'] > filters['cost']:
+            return False
+
+    return True
+        
 
 def sort_functions(day, time, name, value):
     if name == 'times':
@@ -258,7 +287,7 @@ def display_next_time(day, time, all_times):
             return DAYS[current_day] + ', ' + str(all_times[DAYS[current_day]][0]) + ':00'
 
 def _cred_ind(successes, failures, swipes, resp_time):
-    first_frac = (successes+1)/(failures+1)
+    first_frac = (successes)/(failures+1)
     second_frac = (swipes/(math.sqrt(resp_time+1)))
 
     return first_frac * second_frac
@@ -275,6 +304,11 @@ def _get_sorting_preferences(sort_by):
         return sorter
 
     return DEFAULT_SORT
+
+def get_data():
+    #json_text = apirequest.get_request({'times':time})
+    json_data = open('dankbase.json')
+    return json.load(json_data)
         
 
 
